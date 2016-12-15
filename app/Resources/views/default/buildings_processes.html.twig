@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Заявка за строеж на сгради</h1>
+    <form method="post" name="register">
+        <input type="text" name="player[username]">
+        <input type="text" name="player[password]">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('register') }}"/>
+        <input type="submit">
+    </form>
+
+
+{% endblock %}
+
+{% block main %}
+
+{% endblock %}
+
