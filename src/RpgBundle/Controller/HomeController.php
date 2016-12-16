@@ -22,7 +22,7 @@ class HomeController extends Controller
         if ($user) {
             $session = $this->get('session');
             if(!$session->has('planet_id')) {
-                $session->set('planet_id', $user->getPlanets()[0]);
+                $session->set('planet_id', $user->getPlanets()[0])->getId();
             }
         }
         return $this->render('rpg/index');

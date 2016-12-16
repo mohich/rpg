@@ -6,8 +6,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+
 /**
- * Player
+ * User
  *
  * @ORM\Table(name="players")
  * @ORM\Entity(repositoryClass="RpgBundle\Repository\PlayerRepository")
@@ -25,23 +26,23 @@ class Player implements UserInterface
 
     /**
      * @var string
-     * @Assert\NotBlank()
-     * @ORM\Column(name="username", type="string", length=255, unique=true)
+     *
+     * @ORM\Column(name="username", type="string", length=100, unique=true)
      */
     private $username;
 
+
     /**
      * @var string
-     * @Assert\Length(min = 3, minMessage ="the password must be more than 3 characters")
+     *
      * @ORM\Column(name="password", type="string", length=255)
      */
     private $password;
 
-
     /**
      * @var Planet[]
+     *
      * @ORM\OneToMany(targetEntity="RpgBundle\Entity\Planet", mappedBy="player")
-     * @ORM\JoinColumn(name="player_id")
      */
     private $planets;
 
@@ -51,21 +52,6 @@ class Player implements UserInterface
         $this->planets = new ArrayCollection();
     }
 
-    /**
-     * @return Planet[]
-     */
-    public function getPlanets()
-    {
-        return $this->planets;
-    }
-
-    /**
-     * @param Planet[] $planets
-     */
-    public function setPlanets(array $planets)
-    {
-        $this->planets = $planets;
-    }
 
     /**
      * Get id
@@ -100,6 +86,8 @@ class Player implements UserInterface
     {
         return $this->username;
     }
+
+
 
     /**
      * Set password
@@ -143,7 +131,7 @@ class Player implements UserInterface
      */
     public function getRoles()
     {
-      return [];  // TODO: Implement getRoles() method.
+        return ['ROLE_USER'];
     }
 
     /**
@@ -155,7 +143,7 @@ class Player implements UserInterface
      */
     public function getSalt()
     {
-        // TODO: Implement getSalt() method.
+        return null;
     }
 
     /**
@@ -167,6 +155,29 @@ class Player implements UserInterface
     public function eraseCredentials()
     {
         // TODO: Implement eraseCredentials() method.
+    }
+
+    /**
+     * @return Planet[]
+     */
+    public function getPlanets()
+    {
+        return $this->planets;
+    }
+
+    /**
+     * @param Planet[] $planets
+     */
+    public function setPlanets(array $planets)
+    {
+        $this->planets = $planets;
+    }
+
+
+
+    function __toString()
+    {
+        return $this->fullName;
     }
 }
 

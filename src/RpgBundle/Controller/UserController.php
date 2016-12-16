@@ -2,7 +2,10 @@
 
 namespace RpgBundle\Controller;
 use RpgBundle\DTO\PlayerRegisterBindingModel;
+use RpgBundle\Entity\Building;
+use RpgBundle\Entity\GameResource;
 use RpgBundle\Entity\Planet;
+use RpgBundle\Entity\PlanetResource;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use RpgBundle\Entity\Player;
 use RpgBundle\Form\PlayerType;
@@ -10,7 +13,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-
+use RpgBundle\Entity\PlanetBuilding;
 
 /**
  * Class UserController
@@ -26,7 +29,7 @@ class UserController extends PlanetAwareController
     CONST MIN_Y = 0;
     CONST MAX_Y = 100;
     CONST START_PLANETS = 2;
-
+    CONST INITIAL_RESOURCES = 10000;
     /**
      * @Route("/", name="rpg_index")
      * @Method("GET")
@@ -44,14 +47,14 @@ class UserController extends PlanetAwareController
     {
         /** @var Player $player */
         $player = $this->getUser();
-        return $this->render("user/profile", [
-            "user" => $player,
+        return $this->render("user/profile.html.twig", [
+            "player" => $player,
             "planetId" => $this->getPlanet()
         ]);
     }
 
     /**
-     * @Route("/user/change/{id}", name="change_planet")
+     * @Route("/player/change_planet/{id}", name="change_planet")
      * @param $id
      * @return RedirectResponse
      */
@@ -117,6 +120,27 @@ class UserController extends PlanetAwareController
             $em = $this->getDoctrine()->getManager();
             $em->persist($player);
             $em->flush();
+            // предложение за произволно разпределяне на Amount за всеки ресурс на планета
+
+            $numberOfPlanets=self::START_PLANETS;
+
+            $avgPlanetResorce=self::INITIAL_RESOURCES ;
+            $currDistributedResources=0;
+            for ($i=0;$i<$numberOfPlanets-1;$i++)
+            {
+                $planetResorceAmount[$i]=intval(0.01*rand(65,135)*($avgPlanetResorce*$numberOfPlanets-$currDistributedResources)/($numberOfPlanets-$i+1));
+                $currDistributedResources=$currDistributedResources+$planetResorceAmount[$i];
+            }
+            $planetResorceAmount[$numberOfPlanets-1]=$avgPlanetResorce*$numberOfPlanets-$currDistributedResources;
+
+
+
+
+
+
+
+
+
 
             for ($i = 0; $i < self::START_PLANETS; $i++) {
                 $x = -1;
@@ -135,8 +159,32 @@ class UserController extends PlanetAwareController
                 $planet->setY($y);
                 $planet->setName($player->getUsername() . "_" . ($i + 1));
                 $planet->setPlayer($player);
+
                 $em->persist($planet);
                 $em->flush();
+
+                $resourceRepository = $this->getDoctrine()->getRepository(GameResource::class);
+                $resourseTypes = $resourceRepository->findAll();
+
+                foreach ($resourseTypes as $resourseType){
+                    $planetResource = new PlanetResource();
+                    $planetResource->setResource($resourseType);
+                    $planetResource->setPlanet($planet);
+                    $planetResource->setAmount($planetResorceAmount[$i]);
+                    $em->persist($planetResource);
+                    $em->flush();
+                }
+                $buidingRepository = $this->getDoctrine()->getRepository(Building::class);
+                $buildingTypes = $buidingRepository->findAll();
+                foreach ($buildingTypes as $buildingType){
+                    $planetBuilding = new PlanetBuilding();
+                    $planetBuilding->setPlanet($planet);
+                    $planetBuilding->setBuilding($buildingType);
+                    $planetBuilding->setLevel(0);
+                    $em->persist($planetBuilding);
+                    $em->flush();
+                }
+
             };
 
             //при успешна регистрация препраща в Login
@@ -144,7 +192,11 @@ class UserController extends PlanetAwareController
         }
         $form->getErrors();
         //при неуспешна, остава на същата страница за регистрация
-        return $this->redirectToRoute("player_register");
+       return $this->redirectToRoute("player_register");
+       // return $this->render('user/register.html.twig', array(
+        //'form'=>$form->createView()
+        //)
+        //);
 
     }
 

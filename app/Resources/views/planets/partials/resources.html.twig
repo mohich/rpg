@@ -1,0 +1,5 @@
+{% for resource in planet.resources %}
+    <li>
+        <a href="#">{{ resource.resource.name }}:{{ resource.amount }}</a>
+    </li>
+{% endfor %}

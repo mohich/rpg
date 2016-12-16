@@ -28,9 +28,8 @@
                 <div class="navbar-header">
                     <a href="{{ path('rpg_index') }}" class="navbar-brand">RPG</a>
                     {% if app.user %}
-                       <a href="{{  path('buildings_processes') }}" class="navbar-brand">
-                            Upgrade Buildings
-                        </a>
+
+
                         <a href="{{  path('ships_processes') }}" class="navbar-brand">
                             Create Ships
                         </a><a href="{{  path('flights') }}" class="navbar-brand">
@@ -45,6 +44,14 @@
                     </button>
                 </div>
                 <div class="navbar-collapse collapse">
+
+                    {% if app.user %}
+                         {  <ul class ="nav navbar-nav navbar-left">
+                                {{ render(controller('RpgBundle:PlanetAware:resources'
+                                )) }}
+                            </ul>
+                    {% endif %}
+
                     <ul class="nav navbar-nav navbar-right">
                         {% if app.user %}
                             <li>

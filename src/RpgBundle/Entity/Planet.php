@@ -2,6 +2,7 @@
 
 namespace RpgBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 /**
@@ -23,11 +24,12 @@ class Planet
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string")
+     * @ORM\Column(name="name", type="string" ,length=255)
      */
     private $name;
 
     /**
+     * Get name
      * @return string
      */
     public function getName()
@@ -36,11 +38,14 @@ class Planet
     }
 
     /**
+     * Set name
      * @param string $name
+     * @return Planet
      */
-    public function setName(string $name)
+    public function setName($name)
     {
         $this->name = $name;
+        return $this;
     }
 
     /**
@@ -62,12 +67,67 @@ class Planet
      * @var Player
      *
      * @ORM\ManyToOne(targetEntity="RpgBundle\Entity\Player", inversedBy="planets")
-     * @ORM\JoinColumn(name="player_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="player_id")
      */
     private $player;
 
+
     /**
-     * @return mixed
+     * @var PlanetResource[]
+     *
+     * @ORM\OneToMany(targetEntity="RpgBundle\Entity\PlanetResource", mappedBy="planet")
+     */
+
+    private $resources;
+
+    /**
+     * @var PlanetBuilding[]
+     * @ORM\OneToMany(targetEntity="RpgBundle\Entity\PlanetBuilding", mappedBy="planet")
+     */
+    private $buildings;
+
+    /**
+     * @return PlanetBuilding[]
+     */
+    public function getBuildings()
+    {
+        return $this->buildings;
+    }
+
+    /**
+     * @param PlanetBuilding[] $buildings
+     */
+    public function setBuildings(array $buildings)
+    {
+        $this->buildings = $buildings;
+    }
+
+    public function __construct()
+    {
+        $this->resources = new ArrayCollection();
+        $this->buildings = new ArrayCollection();
+    }
+
+    /**
+     * @return PlanetResource[]
+     */
+    public function getResources()
+    {
+        return $this->resources;
+    }
+
+    /**
+     * @param PlanetResource[] $resources
+     */
+    public function setResources(array $resources)
+    {
+        $this->resources = $resources;
+    }
+
+
+
+    /**
+     * @return Player
      */
     public function getPlayer()
     {
@@ -75,9 +135,9 @@ class Planet
     }
 
     /**
-     * @param mixed $player
+     * @param Player $player
      */
-    public function setPlayer($player)
+    public function setPlayer(Player $player)
     {
         $this->player = $player;
     }
